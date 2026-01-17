@@ -417,7 +417,12 @@ int main(int argc, char* argv[]) {
         res.set_content(json, "application/json");
     });
 
-    cout << "Starting at http://localhost:" << port << "\n";
+    string host = "localhost";
+    if (!should_open_browser) {
+        host = "0.0.0.0";
+    }
+
+    cout << "Starting at http://" << host << ":" << port << "\n";
     if (should_open_browser) {
         thread([port]() {
             this_thread::sleep_for(chrono::seconds(1));
@@ -425,5 +430,5 @@ int main(int argc, char* argv[]) {
         }).detach();
     }
 
-    svr.listen("localhost", port);
+    svr.listen(host.c_str(), port);
 }
