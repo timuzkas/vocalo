@@ -249,7 +249,19 @@ void save_session(const Session& s) {
 // ==========================================
 // Main
 // ==========================================
-int main() {
+int main(int argc, char* argv[]) {
+    int port = 8080;
+    bool should_open_browser = true;
+
+    for (int i = 1; i < argc; ++i) {
+        string arg = argv[i];
+        if (arg == "--port" && i + 1 < argc) {
+            port = stoi(argv[++i]);
+        } else if (arg == "--no-browser") {
+            should_open_browser = false;
+        }
+    }
+
     cout << "Vocalo - Language Learning App\n";
     cout << "Data: " << get_data_directory() << "\n";
 
@@ -405,11 +417,13 @@ int main() {
         res.set_content(json, "application/json");
     });
 
-    cout << "Starting at http://localhost:8080\n";
-    thread([]() {
-        this_thread::sleep_for(chrono::seconds(1));
-        open_browser("http://localhost:8080");
-    }).detach();
+    cout << "Starting at http://localhost:" << port << "\n";
+    if (should_open_browser) {
+        thread([port]() {
+            this_thread::sleep_for(chrono::seconds(1));
+            open_browser("http://localhost:" + to_string(port));
+        }).detach();
+    }
 
-    svr.listen("localhost", 8080);
+    svr.listen("localhost", port);
 }
